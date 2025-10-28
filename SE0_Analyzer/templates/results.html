@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Analysis Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='results.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 SEO Analysis Results</h1>
+            {% if error %}
+                <p class="error-message">{{ error }}</p>
+            {% else %}
+                <p>Analysis for: <strong>{{ url }}</strong></p>
+            {% endif %}
+        </div>
+
+        {% if not error %}
+        <!-- SEO Score Section -->
+        <div class="score-card">
+            <div class="score-circle">
+                <div class="score-number">{{ score }}</div>
+                <div class="score-label">/ 100</div>
+            </div>
+            <div class="score-status">
+                {% if score >= 80 %}
+                    <h2 class="status-excellent">🎉 Excellent!</h2>
+                    <p>Your website has great SEO!</p>
+                {% elif score >= 60 %}
+                    <h2 class="status-good">👍 Good</h2>
+                    <p>Your SEO is decent, but there's room for improvement</p>
+                {% else %}
+                    <h2 class="status-needs-work">⚠️ Needs Work</h2>
+                    <p>Your website needs SEO improvements</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Category Scores -->
+        <div class="category-scores">
+            <h2 class="section-title">📈 Score Breakdown</h2>
+            <div class="category-grid">
+                <div class="category-item">
+                    <div class="category-name">Meta Tags</div>
+                    <div class="category-bar">
+                        <div class="category-progress" style="width: {{ analysis.category_percentages.meta_tags }}%"></div>
+                    </div>
+                    <div class="category-score">{{ analysis.category_scores.meta_tags }}/30</div>
+                </div>
+                <div class="category-item">
+                    <div class="category-name">Content Structure</div>
+                    <div class="category-bar">
+                        <div class="category-progress" style="width: {{ analysis.category_percentages.content }}%"></div>
+                    </div>
+                    <div class="category-score">{{ analysis.category_scores.content }}/35</div>
+                </div>
+                <div class="category-item">
+                    <div class="category-name">Technical SEO</div>
+                    <div class="category-bar">
+                        <div class="category-progress" style="width: {{ analysis.category_percentages.technical }}%"></div>
+                    </div>
+                    <div class="category-score">{{ analysis.category_scores.technical }}/25</div>
+                </div>
+                <div class="category-item">
+                    <div class="category-name">Social & Images</div>
+                    <div class="category-bar">
+                        <div class="category-progress" style="width: {{ analysis.category_percentages.social }}%"></div>
+                    </div>
+                    <div class="category-score">{{ analysis.category_scores.social }}/10</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Strengths Section -->
+        {% if strengths %}
+        <div class="section-card">
+            <h2 class="section-title">✅ What's Working Well</h2>
+            <ul class="strengths-list">
+                {% for strength in strengths %}
+                <li>{{ strength }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Issues Section -->
+        {% if issues %}
+        <div class="section-card">
+            <h2 class="section-title">🔧 Issues to Fix</h2>
+            <ul class="issues-list">
+                {% for issue in issues %}
+                <li>{{ issue }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- AI Suggestions (only if score < 70) -->
+        {% if suggestions %}
+        <div class="suggestions-section">
+            <h2 class="section-title">🤖 AI-Powered Recommendations for {{ industry }}</h2>
+            
+            <!-- Optimized Title -->
+            <div class="suggestion-card">
+                <h3>📝 Optimized Title Tag</h3>
+                <div class="suggestion-comparison">
+                    <div class="current-tag">
+                        <span class="tag-label">Current:</span>
+                        <div class="tag-content">{{ seo_data.title or 'Missing' }}</div>
+                        <div class="tag-length">{{ seo_data.title_length or 0 }} characters</div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="suggested-tag">
+                        <span class="tag-label">Suggested:</span>
+                        <div class="tag-content suggested">{{ suggestions.optimized_title }}</div>
+                        <div class="tag-length">{{ suggestions.optimized_title|length }} characters</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Optimized Meta Description -->
+            <div class="suggestion-card">
+                <h3>📄 Optimized Meta Description</h3>
+                <div class="suggestion-comparison">
+                    <div class="current-tag">
+                        <span class="tag-label">Current:</span>
+                        <div class="tag-content">{{ seo_data.meta_description or 'Missing' }}</div>
+                        <div class="tag-length">{{ seo_data.meta_description_length or 0 }} characters</div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="suggested-tag">
+                        <span class="tag-label">Suggested:</span>
+                        <div class="tag-content suggested">{{ suggestions.optimized_meta_description }}</div>
+                        <div class="tag-length">{{ suggestions.optimized_meta_description|length }} characters</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Improved H1 -->
+            <div class="suggestion-card">
+                <h3>🎯 Improved H1 Tag</h3>
+                <div class="suggestion-comparison">
+                    <div class="current-tag">
+                        <span class="tag-label">Current:</span>
+                        <div class="tag-content">{{ seo_data.h1_tags[0] if seo_data.h1_tags else 'Missing' }}</div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="suggested-tag">
+                        <span class="tag-label">Suggested:</span>
+                        <div class="tag-content suggested">{{ suggestions.improved_h1 }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Outline -->
+            <div class="suggestion-card">
+                <h3>📋 Recommended Content Outline (H2 Structure)</h3>
+                <ol class="content-outline-list">
+                    {% for outline in suggestions.content_outline %}
+                    <li>{{ outline }}</li>
+                    {% endfor %}
+                </ol>
+            </div>
+
+            <!-- Keywords -->
+            <div class="suggestion-card">
+                <h3>🎯 Target Keywords</h3>
+                <div class="keyword-grid">
+                    {% for keyword in suggestions.keywords %}
+                    <span class="keyword-tag">{{ keyword }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Blog Topics -->
+            <div class="suggestion-card">
+                <h3>✍️ Blog Topic Ideas</h3>
+                <ol class="blog-topics-list">
+                    {% for topic in suggestions.blog_topics %}
+                    <li>{{ topic }}</li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Technical Details Section -->
+        <div class="section-card technical-details">
+            <h2 class="section-title">🔍 Technical Details</h2>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Page Title:</span>
+                    <span class="detail-value">{{ seo_data.title or 'Not found' }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">HTTPS Secure:</span>
+                    <span class="detail-value">{{ '✅ Yes' if seo_data.has_https else '❌ No' }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Load Time:</span>
+                    <span class="detail-value">{{ seo_data.load_time }}s</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Page Size:</span>
+                    <span class="detail-value">{{ "%.1f"|format(seo_data.page_size_kb) }} KB</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Word Count:</span>
+                    <span class="detail-value">{{ seo_data.word_count }} words</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">H1 Tags:</span>
+                    <span class="detail-value">{{ seo_data.h1_tags|length }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">H2 Tags:</span>
+                    <span class="detail-value">{{ seo_data.h2_tags|length }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Total Images:</span>
+                    <span class="detail-value">{{ seo_data.images }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Images with Alt:</span>
+                    <span class="detail-value">{{ seo_data.images_with_alt }}/{{ seo_data.images }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Internal Links:</span>
+                    <span class="detail-value">{{ seo_data.internal_links }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">External Links:</span>
+                    <span class="detail-value">{{ seo_data.external_links }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Mobile Viewport:</span>
+                    <span class="detail-value">{{ '✅ Yes' if seo_data.has_viewport else '❌ No' }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Structured Data:</span>
+                    <span class="detail-value">{{ '✅ Yes' if seo_data.has_schema else '❌ No' }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Canonical URL:</span>
+                    <span class="detail-value">{{ '✅ Yes' if seo_data.canonical_url else '❌ No' }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Open Graph:</span>
+                    <span class="detail-value">{{ '✅ Yes' if seo_data.og_title else '❌ No' }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Language:</span>
+                    <span class="detail-value">{{ seo_data.language or 'Not set' }}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Back Button -->
+        <div class="action-buttons">
+            <a href="/" class="btn-back">← Analyze Another Website</a>
+        </div>
+    </div>
+</body>
+</html>
