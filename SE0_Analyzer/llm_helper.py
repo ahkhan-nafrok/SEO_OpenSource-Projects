@@ -8,7 +8,7 @@ def get_seo_suggestions(industry, seo_data, issues):
     """
     
     # Configure API key
-    api_key = os.getenv('GEMINI_API_KEY', 'AIzaSyB6kUdL4oPgML0R3xrb1Cv_KuODljRX46k')
+    api_key = os.getenv('GEMINI_API_KEY', 'YOUR_API_KEY')
     
     if not api_key or api_key == 'YOUR_API_KEY_HERE':
         print("⚠️ API key not configured properly")
@@ -286,4 +286,5 @@ def test_api():
         return True
     except Exception as e:
         print(f"❌ API Test Failed: {e}")
+
         return False
